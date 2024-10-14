@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Management WJC Time Request</title>
+    <style>
+        body {
+            font-family: Segoe UI, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            font-size: 15px;
+        }
+        #current-date {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 8px;
+            color: #777;
+        }
+        .username {
+            top: 10px;
+            right:20px;
+            font-size: 8px;
+            position:absolute;
+        }
+        form {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            padding-bottom: 15px;
+        }
+        .form-section {
+            margin-bottom: 0px;
+        }
+        h2 {
+            color: #3498db;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"], input[type="time"], input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .signature {
+            position: absolute;
+            bottom: 10px;
+            right: 20px;
+            font-size: 8px;
+            color: #777;
+        }
+        @media print {
+            body {
+                max-width: 100%;
+                padding: 0;
+            }
+            form {
+                box-shadow: none;
+                background-color: white;
+            }
+            button, .signature, input[type="file"] {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <form id="timeForm">
+        <h1><u>Water-Jet Cutting Time Request</u></h1>
+        <div class="form-section">
+            <span id="current-date"></span><p class="username">AB</p>
+            <h2>Management Section</h2>
+            <label for="customer-name">Customer Name:</label>
+            <input type="text" id="customer-name" name="customer-name" required>
+
+            <label for="dxf-dwg">DXF/DWG File Name:</label>
+            <input type="text" id="dxf-dwg" name="dxf-dwg" required>
+
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" name="quantity" required>
+
+            <label for="material">Material & Thickness:</label>
+            <input type="text" id="material" name="material" required>
+
+            <button type="button" id="exportButton">Export Data</button>
+        </div>
+
+        <div class="form-section">
+            <h2>Employee Section</h2>
+            <label for="pierce-time">Pierce time:</label>
+            <input type="time" id="pierce-time" name="pierce-time" step="60" required>
+
+            <label for="pre-pierce-time">Pre-Pierce time:</label>
+            <input type="time" id="pre-pierce-time" name="pre-pierce-time" step="60" required>
+
+            <label for="cutting-time">Cutting time:</label>
+            <input type="time" id="cutting-time" name="cutting-time" step="60" required>
+
+            <label for="prep-time">Prep time:</label>
+            <input type="time" id="prep-time" name="prep-time" step="60" required>
+
+            <label for="sheet-multiplier">Sheet Multiplier:</label>
+            <input type="number" id="sheet-multiplier" name="sheet-multiplier" value="1" min="1" step="1" required>
+
+            <label for="total">Total:</label>
+            <input type="time" id="total" name="total" step="60" readonly>
+        </div>
+
+        <button type="button" id="printButton">Print</button>
+        <div class="signature"><i>App coded by</i> <b>Ashley Booth</b><i> for</i> <b>REDACTED</b></div>
+    </form>
+
+    <script>
+    function updateTotal() {
+        const timeInputs = ['pierce-time', 'pre-pierce-time', 'cutting-time', 'prep-time'];
+        const multiplier = parseInt(document.getElementById('sheet-multiplier').value) || 1;
+        let totalMinutes = 0;
+
+        timeInputs.forEach(id => {
+            const input = document.getElementById(id);
+            const [hours, minutes] = input.value.split(':').map(Number);
+            totalMinutes += (hours * 60 + minutes) * multiplier;
+        });
+
+        const totalHours = Math.floor(totalMinutes / 60);
+        const remainingMinutes = totalMinutes % 60;
+        document.getElementById('total').value = 
+            `${totalHours.toString().padStart(2, '0')}:${remainingMinutes.toString().padStart(2, '0')}`;
+    }
+
+    function exportManagementData() {
+            const managementData = {
+                customerName: document.getElementById('customer-name').value,
+                dxfDwg: document.getElementById('dxf-dwg').value,
+                quantity: document.getElementById('quantity').value,
+                material: document.getElementById('material').value
+            };
+
+            const dataStr = JSON.stringify(managementData);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'management_data.json';
+
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+    function importManagementData() {
+        const fileInput = document.getElementById('importFile');
+        const file = fileInput.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const managementData = JSON.parse(e.target.result);
+                document.getElementById('customer-name').value = managementData.customerName;
+                document.getElementById('dxf-dwg').value = managementData.dxfDwg;
+                document.getElementById('quantity').value = managementData.quantity;
+                document.getElementById('material').value = managementData.material;
+            };
+            reader.readAsText(file);
+        }
+    }
+
+    function setCurrentDate() {
+        const today = new Date();
+        const dd = String(today.getDate()).padStart(2, '0');
+        const mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0
+        const yyyy = today.getFullYear();
+        const formattedDate = `${dd}/${mm}/${yyyy}`;
+        document.getElementById('current-date').textContent = formattedDate;
+    }
+
+    // Event listeners
+    window.addEventListener('load', function() {
+        setCurrentDate();
+
+        const form = document.getElementById('timeForm');
+        const timeInputs = form.querySelectorAll('input[type="time"], input[type="number"]');
+
+        timeInputs.forEach(input => {
+            input.addEventListener('change', updateTotal);
+        });
+
+        document.getElementById('exportButton').addEventListener('click', exportManagementData);
+        document.getElementById('printButton').addEventListener('click', function() {
+            window.print();
+        });
+    });
+    </script>
+</body>
+</html>
