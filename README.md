@@ -23,5 +23,5 @@ Additional Feature:
 Includes a time converter app to help operators convert seconds to minutes and hours when calculating pre-pierce time.
 Overall, this web app aims to optimize the process of estimating water jet cutting times, enhancing efficiency and accuracy in quoting and delivering customer orders. 🚀
 
-Check out the [Management App](Management App.html "Management App")
-Check out the [Employee App](Employee App.html "Employee App")
+Check out the [Management App](Management%20App.html)
+Check out the [Employee App](Employee%20App.html)
