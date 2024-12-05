@@ -1,5 +1,7 @@
 # CNC-Machine-Time-Estimation
 
+![form](https://github.com/user-attachments/assets/aee8878c-45f1-42ac-b699-2e5f9f6d12dc)
+
 Interactive web applications to streamline the process for management to request time estimates for customer orders and employees to calculate those estimates, enabling consistent &amp; accurate pricing and quoting.
 
 ## Management Side:
